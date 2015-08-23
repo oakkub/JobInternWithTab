@@ -1,0 +1,35 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".MainActivity">
+
+    <item
+        android:id="@+id/search_settings"
+        android:title="Search"
+        android:orderInCategory="1"
+        android:icon="@android:drawable/ic_menu_search"
+        app:actionViewClass="android.widget.SearchView"
+        app:showAsAction="always" />
+
+    <!--<item
+        android:id="@+id/notification_enable_settings"
+        android:title="Job notification"
+        android:orderInCategory="99"
+        android:actionViewClass="android.widget.CheckBox"
+        android:checkable="true"
+        app:showAsAction="never" />-->
+
+    <item
+        android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="98"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/logout_settings"
+        android:title="@string/logoutSettings"
+        android:orderInCategory="99"
+        app:showAsAction="never" />
+
+</menu>

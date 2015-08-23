@@ -1,0 +1,23 @@
+<resources>
+
+    <string name="title_activity_settings">Settings</string>
+
+    <string name="key_job_type_setting" translatable="false">jobTypeLists</string>
+    <string name="title_job_type_setting">Type job</string>
+    <string name="default_value_job_type_setting" translatable="false">Requested</string>
+    <string name="default_entry_job_type_setting" translatable="false">Requested</string>
+    <string-array name="value_job_type_setting" translatable="false">
+        <item>Requested</item>
+        <item>Postponed</item>
+        <item>Disapproved</item>
+        <item>Approved</item>
+    </string-array>
+    <string-array name="entries_job_type_setting">
+        <item>Requested</item>
+        <item>Postponed</item>
+        <item>Disapproved</item>
+        <item>Approved</item>
+    </string-array>
+
+
+</resources>

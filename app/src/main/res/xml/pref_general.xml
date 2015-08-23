@@ -1,0 +1,26 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+   <!-- <ListPreference
+        android:key="@string/key_job_type_setting"
+        android:title="@string/title_job_type_setting"
+        android:defaultValue="@string/default_value_job_type_setting"
+        android:entries="@array/entries_job_type_setting"
+        android:entryValues="@array/value_job_type_setting"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"/>-->
+
+    <PreferenceCategory
+        android:title="@string/notification_title_settings"
+        android:key="@string/notification_group">
+
+        <SwitchPreference
+            android:key="@string/key_notification_settings"
+            android:title="@string/enabled"
+            android:summaryOn="@string/notification_true"
+            android:summaryOff="@string/notification_false"
+            android:defaultValue="true" />
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>
