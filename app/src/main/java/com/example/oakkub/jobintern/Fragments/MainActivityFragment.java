@@ -1,13 +1,10 @@
 package com.example.oakkub.jobintern.Fragments;
 
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -21,7 +18,6 @@ import com.example.oakkub.jobintern.R;
 import com.example.oakkub.jobintern.UI.RecyclerView.EndlessRecyclerViewOnScrollListener;
 import com.example.oakkub.jobintern.UI.RecyclerView.RecyclerViewEditedJobAdvanceAdapter;
 import com.example.oakkub.jobintern.UI.RecyclerView.RecyclerViewJobAdvanceClickListener;
-import com.example.oakkub.jobintern.UI.SearchView.SearchViewStateManager;
 import com.example.oakkub.jobintern.Utilities.UtilString;
 
 import java.util.List;
@@ -37,19 +33,13 @@ import retrofit.client.Response;
  */
 public class MainActivityFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
 
+    public static final int LOAD_AMOUNT = 10;
     private static final String FRAGMENT_TYPE = "fragmentPosition";
     private static final String RECYCLE_STATE = "recyclerView";
     private static final String ALERT_DIALOG_STATE = "jobAlertDialog";
-    private static final String NETWORK_ALERT_DIALOG_STATE = "networkAlertDialog";
-
-    public static final int LOAD_AMOUNT = 10;
-
-    private View rootView;
     @Bind(R.id.mainRecyclerView) RecyclerView recyclerView;
     @Bind(R.id.swipeRefreshMainLayout) SwipeRefreshLayout swipeRefreshLayout;
-
-    private AlertDialog networkAlertDialog;
-
+    private View rootView;
     private RecyclerViewEditedJobAdvanceAdapter recyclerViewEditedJobAdvanceAdapter;
     private RecyclerViewJobAdvanceClickListener recyclerViewJobAdvanceClickListener;
     private EndlessRecyclerViewOnScrollListener endlessRecyclerViewOnScrollListener;
@@ -89,6 +79,7 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
 
         ButterKnife.bind(this, rootView);
 
+        // getArguments will get the bundle that was set by method setArguments()
         Bundle args = getArguments();
         fetchCondition = args.getString(FRAGMENT_TYPE);
 
@@ -114,6 +105,14 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
     }
 
     @Override
+    public void onPause() {
+
+        recyclerViewJobAdvanceClickListener.dismissDialog();
+
+        super.onPause();
+    }
+
+    @Override
     public void onSaveInstanceState(Bundle outState) {
 
         outState.putParcelable(RECYCLE_STATE, recyclerView.getLayoutManager().onSaveInstanceState());
@@ -122,12 +121,6 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
 
             outState.putBundle(ALERT_DIALOG_STATE, recyclerViewJobAdvanceClickListener.getAlertDialog().onSaveInstanceState());
             recyclerViewJobAdvanceClickListener.dismissDialog();
-        }
-
-        if(networkAlertDialog != null) {
-            if(networkAlertDialog.isShowing()) {
-                outState.putBundle(NETWORK_ALERT_DIALOG_STATE, networkAlertDialog.onSaveInstanceState());
-            }
         }
 
         super.onSaveInstanceState(outState);
@@ -145,13 +138,6 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
 
                 if(savedInstanceState.containsKey(ALERT_DIALOG_STATE)) {
                     recyclerViewJobAdvanceClickListener.getAlertDialog().onRestoreInstanceState(savedInstanceState.getBundle(ALERT_DIALOG_STATE));
-                }
-            }
-
-            if(networkAlertDialog != null) {
-
-                if(savedInstanceState.containsKey(NETWORK_ALERT_DIALOG_STATE)) {
-                    networkAlertDialog.onRestoreInstanceState(savedInstanceState.getBundle(NETWORK_ALERT_DIALOG_STATE));
                 }
             }
 
@@ -184,24 +170,6 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
         };
         recyclerView.addOnScrollListener(endlessRecyclerViewOnScrollListener);
         recyclerView.setAdapter(recyclerViewEditedJobAdvanceAdapter);
-
-    }
-
-    private void createNetworkProblemAlertDialog() {
-
-        final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
-                .setTitle("Network problem")
-                .setMessage("Please check you internet connection, and come back.")
-                .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        getActivity().finish();
-                    }
-                })
-                .setCancelable(false);
-
-        networkAlertDialog = builder.create();
-        networkAlertDialog.show();
 
     }
 

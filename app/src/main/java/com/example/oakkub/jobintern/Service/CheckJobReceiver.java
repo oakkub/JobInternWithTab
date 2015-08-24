@@ -37,6 +37,8 @@ public class CheckJobReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
 
+        Log.i("RECEIVER", getClass().getSimpleName());
+
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         // check internet connection and username if user is logged in or not

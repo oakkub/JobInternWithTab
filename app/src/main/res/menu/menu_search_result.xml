@@ -8,15 +8,15 @@
 
     <item
         android:id="@+id/search_type_result_settings"
-        android:title="Search"
-        android:orderInCategory="2"
         android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="2"
+        android:title="@string/Search"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/search_type_settings"
-        android:title="@string/SearchType"
         android:orderInCategory="3"
+        android:title="@string/SearchType"
         app:showAsAction="never" />
 </menu>

@@ -5,9 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
-import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -48,12 +48,9 @@ public class SearchResultFragment extends Fragment implements DialogInterface.On
     public static final String SEARCH_QUERY = "com.example.oakkub.jobintern.Fragments.SEARCH_QUERY";
     private static final String SEARCH_TYPE_DIALOG = "com.example.oakkub.jobintern.Fragments.SEARCH_TYPE_DIALOG";
     private static final String JOB_ALERT_DIALOG_STATE = "com.example.oakkub.jobintern.Fragments.JOB_ALERT_DIALOG_STATE";
-
-    private View rootView;
-
     @Bind(R.id.searchToolbar) Toolbar toolbar;
     @Bind(R.id.searchResultRecyclerView) RecyclerView recyclerView;
-
+    private View rootView;
     private SearchView searchView;
     private SearchViewStateManager searchViewState;
 
@@ -74,8 +71,8 @@ public class SearchResultFragment extends Fragment implements DialogInterface.On
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setRetainInstance(true);
         setHasOptionsMenu(true);
+        setRetainInstance(true);
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
         editor = sharedPreferences.edit();
@@ -89,6 +86,8 @@ public class SearchResultFragment extends Fragment implements DialogInterface.On
         }
 
         fetchCondition = sharedPreferences.getString(UtilString.PREF_SEARCH_TYPE, getString(R.string.default_value_job_type_setting));
+
+        // get types of job to fetch
         searchTypes = getActivity().getResources().getStringArray(R.array.entries_job_type_setting);
 
     }
@@ -123,7 +122,7 @@ public class SearchResultFragment extends Fragment implements DialogInterface.On
         final AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setSingleChoiceItems(searchTypes, checkedPosition, this)
                    .setTitle(getString(R.string.SearchType))
-                   .setNegativeButton("Cancel", null);
+                .setNegativeButton(getString(R.string.cancel), null);
 
         searchTypeAlertDialog = alertDialog.create();
         searchTypeAlertDialog.show();
@@ -247,6 +246,7 @@ public class SearchResultFragment extends Fragment implements DialogInterface.On
         recyclerView.setAdapter(resultAdapter);
 
         resultAdapter.notifyDataSetChanged();
+        // add progress bars
         resultAdapter.addItem(null);
         fetchJobAdvanceByQuery();
 
@@ -299,11 +299,9 @@ public class SearchResultFragment extends Fragment implements DialogInterface.On
                     @Override
                     public void success(List<JobAdvance> jobAdvancesFromServer, Response response) {
 
-                        final int size = jobAdvancesFromServer.size();
-
                         resultAdapter.removeLast();
 
-                        if (size > 0) {
+                        if (jobAdvancesFromServer.size() > 0) {
 
                             // remove progress bar
                             resultAdapter.addAllItem(jobAdvancesFromServer);

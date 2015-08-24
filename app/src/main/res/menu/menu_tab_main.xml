@@ -1,35 +1,26 @@
-<menu
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MainActivity">
+    tools:context="com.example.oakkub.jobintern.Activities.TabMainActivity">
 
     <item
         android:id="@+id/search_settings"
-        android:title="Search"
-        android:orderInCategory="1"
         android:icon="@android:drawable/ic_menu_search"
+        android:orderInCategory="2"
+        android:title="@string/Search"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="always" />
 
-    <!--<item
-        android:id="@+id/notification_enable_settings"
-        android:title="Job notification"
-        android:orderInCategory="99"
-        android:actionViewClass="android.widget.CheckBox"
-        android:checkable="true"
-        app:showAsAction="never" />-->
-
     <item
         android:id="@+id/action_settings"
-        android:title="@string/action_settings"
         android:orderInCategory="98"
+        android:title="@string/action_settings"
         app:showAsAction="never" />
 
     <item
         android:id="@+id/logout_settings"
-        android:title="@string/logoutSettings"
         android:orderInCategory="99"
+        android:title="@string/logoutSettings"
         app:showAsAction="never" />
 
 </menu>

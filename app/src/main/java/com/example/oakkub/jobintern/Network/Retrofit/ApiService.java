@@ -7,6 +7,7 @@ import com.example.oakkub.jobintern.Objects.JobAdvance;
 import java.util.List;
 
 import retrofit.Callback;
+import retrofit.client.Response;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
@@ -35,7 +36,7 @@ public interface ApiService {
     void checkNewJobAdvance(Callback<CheckNewJobAdvance> checkNewJobAdvanceCallback);
 
     @GET("/set_notified_job_advance.php")
-    boolean setNotifiedJobAdvance();
+    Response setNotifiedJobAdvance();
 
     @FormUrlEncoded
     @POST("/login.php")

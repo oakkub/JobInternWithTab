@@ -11,6 +11,8 @@
     <string name="loginTitle">Login</string>
     <string name="endOfResult">End of result.</string>
 
+    <string name="title_activity_tab_main">TabMainActivity</string>
+
     <string name="approve_button">Approve</string>
     <string name="postpone_button">Postpone</string>
     <string name="disapprove_button">Disapprove</string>
@@ -25,4 +27,12 @@
     <string name="notification_group">notification_settings_group</string>
     <string name="enabled">Enabled</string>
 
+    <string name="logout_title">Log Out</string>
+    <string name="logout_message">Are you sure to log out?</string>
+
+    <string name="network_problem_title">Network problem</string>
+    <string name="network_problem_message">Please check you internet connection, and come back.</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
 </resources>

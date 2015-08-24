@@ -7,7 +7,7 @@ import com.crashlytics.android.Crashlytics;
 import com.example.oakkub.jobintern.Network.InternetManager;
 import com.example.oakkub.jobintern.Network.Retrofit.RestClient;
 
-import java.net.SocketTimeoutException;
+import retrofit.RetrofitError;
 
 /**
  * Created by OaKKuB on 8/7/2015.
@@ -35,8 +35,8 @@ public class SetNotifiedJobService extends IntentService {
 
             try {
                 RestClient.getInstance(this).getApiService().setNotifiedJobAdvance();
-            } catch(Exception e) {
-                Crashlytics.logException(e);
+            } catch (RetrofitError error) {
+                Crashlytics.logException(error);
             }
 
         }

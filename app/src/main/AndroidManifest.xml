@@ -25,19 +25,22 @@
         </activity>
 
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".Activities.TabMainActivity"
             android:launchMode="singleTask">
 
             <meta-data
                 android:name="android.app.default_searchable"
                 android:value=".Activities.SearchResultActivity" />
+        </activity>
+
+        <activity android:name=".Activities.MainActivity">
 
         </activity>
 
         <activity
             android:name=".Activities.SearchResultActivity"
-            android:parentActivityName=".Activities.MainActivity"
-            android:launchMode="singleTop" >
+            android:launchMode="singleTop"
+            android:parentActivityName=".Activities.TabMainActivity">
 
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
@@ -46,11 +49,19 @@
             <meta-data
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable" />
-
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".Activities.MainActivity" />
+                android:value=".Activities.TabMainActivity" />
+        </activity>
 
+        <activity
+            android:name=".Settings.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".Activities.MainActivity">
+
+        <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".Activities.MainActivity" />
         </activity>
 
         <receiver
@@ -64,13 +75,11 @@
             -->
         </receiver>
 
-        <receiver
-            android:name=".Service.NetworkChangeReceiver" >
+        <receiver android:name=".Service.NetworkChangeReceiver">
 
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
             </intent-filter>
-
         </receiver>
 
         <receiver
@@ -81,19 +90,10 @@
             android:name=".Service.SetNotifiedJobService"
             android:exported="false" />
 
-        <activity
-            android:name=".Settings.SettingsActivity"
-            android:label="@string/title_activity_settings"
-            android:parentActivityName=".Activities.MainActivity" >
-
-                <meta-data
-                    android:name="android.support.PARENT_ACTIVITY"
-                    android:value=".Activities.MainActivity" />
-        </activity>
-
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="46296a6769626e89a1377ceda3997ea9d2c1f00a" />
+
     </application>
 
 </manifest>
