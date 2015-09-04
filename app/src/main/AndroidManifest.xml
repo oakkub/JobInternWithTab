@@ -17,11 +17,13 @@
         <activity
             android:name=".Activities.LoginActivity"
             android:screenOrientation="portrait" >
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <activity
@@ -64,6 +66,10 @@
                 android:value=".Activities.MainActivity" />
         </activity>
 
+        <provider
+            android:name=".UI.SearchView.SuggestionProvider"
+            android:authorities="com.example.oakkub.jobintern.UI.SearchView.SuggestionProvider" />
+
         <receiver
             android:name=".Service.CheckJobReceiver"
             android:process=":remote" >
@@ -89,10 +95,6 @@
         <service
             android:name=".Service.SetNotifiedJobService"
             android:exported="false" />
-
-        <meta-data
-            android:name="io.fabric.ApiKey"
-            android:value="46296a6769626e89a1377ceda3997ea9d2c1f00a" />
 
     </application>
 

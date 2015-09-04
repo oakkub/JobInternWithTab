@@ -9,25 +9,30 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.example.oakkub.jobintern.Network.InternetManager;
-import com.example.oakkub.jobintern.Utilities.UtilString;
+import com.example.oakkub.jobintern.Utilities.Util;
 
 /**
  * Created by OaKKuB on 8/7/2015.
  */
 public class NetworkChangeReceiver extends BroadcastReceiver {
 
-    private static boolean firstConnect = true;
-
     @Override
     public void onReceive(Context context, Intent intent) {
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        if (!sharedPreferences.contains(Util.CONNECTIVITY_CHANGE)) {
+            setConnectivityChange(editor, true);
+        }
 
         if(InternetManager.isNetworkAvailable(context) &&
-                sharedPreferences.getBoolean(UtilString.PREF_CHECK_BOX_NOTIFICATION, true) &&
-                sharedPreferences.contains(UtilString.PREF_USERNAME) &&
-                !sharedPreferences.getString(UtilString.PREF_USERNAME, "").equals("") &&
-                firstConnect) {
+                sharedPreferences.getBoolean(Util.PREF_CHECK_BOX_NOTIFICATION, true) &&
+                sharedPreferences.contains(Util.PREF_USERNAME) &&
+                !sharedPreferences.getString(Util.PREF_USERNAME, "").equals("") &&
+                sharedPreferences.getBoolean(Util.CONNECTIVITY_CHANGE, true)) {
+
+            setConnectivityChange(editor, false);
 
             Intent alertNewJobIntent = new Intent(context, CheckJobReceiver.class);
             PendingIntent alertPendingIntent = PendingIntent.getBroadcast(
@@ -40,10 +45,13 @@ public class NetworkChangeReceiver extends BroadcastReceiver {
                 e.printStackTrace();
             }
 
-            firstConnect = false;
         } else {
-            firstConnect = true;
+            setConnectivityChange(editor, true);
         }
+    }
 
+    private void setConnectivityChange(SharedPreferences.Editor editor, boolean isConnected) {
+        editor.putBoolean(Util.CONNECTIVITY_CHANGE, isConnected);
+        editor.apply();
     }
 }

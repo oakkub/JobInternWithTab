@@ -4,16 +4,17 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.SearchManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +22,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SearchView;
 
 import com.example.oakkub.jobintern.Activities.LoginActivity;
 import com.example.oakkub.jobintern.Activities.SearchResultActivity;
@@ -29,10 +29,12 @@ import com.example.oakkub.jobintern.R;
 import com.example.oakkub.jobintern.Service.CheckJobReceiver;
 import com.example.oakkub.jobintern.Service.SetNotifiedJobService;
 import com.example.oakkub.jobintern.Settings.SettingsActivity;
+import com.example.oakkub.jobintern.UI.Dialog.AlertDialog.AlertDialogFragment;
 import com.example.oakkub.jobintern.UI.SearchView.SearchViewStateManager;
+import com.example.oakkub.jobintern.UI.SearchView.SuggestionProvider;
 import com.example.oakkub.jobintern.UI.ViewPager.ViewPagerAdapter;
-import com.example.oakkub.jobintern.UI.ViewPager.ViewPagerTransformer;
-import com.example.oakkub.jobintern.Utilities.UtilString;
+import com.example.oakkub.jobintern.Utilities.OrientationDetector;
+import com.example.oakkub.jobintern.Utilities.Util;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -43,9 +45,9 @@ import butterknife.ButterKnife;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class TabMainActivityFragment extends Fragment implements SearchView.OnQueryTextListener {
+public class TabMainActivityFragment extends Fragment implements SearchView.OnQueryTextListener, ViewPager.OnPageChangeListener, SearchView.OnSuggestionListener, AlertDialogFragment.YesNoListener {
 
-    private static final String ALERT_DIALOG_STATE = "com.example.oakkub.jobintern.Fragments.AlertDialog";
+    private static final String LOGOUT_TAG = "logoutAlertDialog";
     private static final long TIME_INTERVAL_CHECK_JOB_TO_NOTIFY = 60 * 1000 * 10; // 10 minutes
     private static final int SETTINGS_REQUEST_CODE = 121;
 
@@ -56,13 +58,15 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
     @Bind(R.id.mainViewPager)
     ViewPager viewPager;
 
+    private AlertDialogFragment logoutDialog;
+
+    private ViewPagerAdapter viewPagerAdapter;
+
     private SearchView searchView;
     private SearchViewStateManager searchViewState;
 
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
-
-    private AlertDialog logoutAlertDialog;
 
     private PendingIntent newJobAlertPendingIntent;
 
@@ -84,6 +88,7 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
 
         initSharedPreference();
         initPushNotification();
+
     }
 
     @Override
@@ -94,21 +99,27 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
 
         ButterKnife.bind(this, rootView);
 
-        initToolbar();
+        initToolbar((AppCompatActivity) getActivity());
 
         viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(new ViewPagerAdapter(getActivity().getSupportFragmentManager(), getActivity()));
-        viewPager.setPageTransformer(true, new ViewPagerTransformer());
-        //viewPager.setPageTransformer(true, new ViewPagerTransformer(ViewPagerTransformer.DEPTH));
+        viewPager.setAdapter(new ViewPagerAdapter(getFragmentManager(), getActivity().getApplicationContext()));
+        viewPager.addOnPageChangeListener(this);
         tabLayout.setupWithViewPager(viewPager);
+
+        if (OrientationDetector.getOrientation(getActivity()) == Configuration.ORIENTATION_LANDSCAPE) {
+
+            tabLayout.setTabMode(TabLayout.MODE_FIXED);
+            tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+
+        }
 
         return rootView;
     }
 
-    private void initToolbar() {
+    private void initToolbar(AppCompatActivity activity) {
 
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setHomeButtonEnabled(true);
+        activity.setSupportActionBar(toolbar);
+        activity.getSupportActionBar().setHomeButtonEnabled(true);
 
     }
 
@@ -125,7 +136,7 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
 
         GregorianCalendar gregorianCalendar = new GregorianCalendar();
         // make AlarmManager start after 10 minutes
-        gregorianCalendar.add(Calendar.MINUTE, 0);
+        gregorianCalendar.add(Calendar.MINUTE, 10);
 
         AlarmManager alarmManager = (AlarmManager) getActivity().getSystemService(Context.ALARM_SERVICE);
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP,
@@ -142,42 +153,40 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
         Intent intent = getActivity().getIntent();
 
         // check if this intent has username
-        if (intent.hasExtra(UtilString.PREF_USERNAME)) {
-            if (username.equals("")) username = intent.getStringExtra(UtilString.PREF_USERNAME);
+        if (intent.hasExtra(Util.PREF_USERNAME)) {
+            if (username.equals("")) username = intent.getStringExtra(Util.PREF_USERNAME);
         } else {
-            username = sharedPreferences.getString(UtilString.PREF_USERNAME, "");
+//            username = sharedPreferences.getString(Util.PREF_USERNAME, "");
+            username = sharedPreferences.getString(Util.PREF_USERNAME, "");
         }
 
         // put username to preference, for check login
         if (editor == null) editor = sharedPreferences.edit();
 
         // put username into SharedPreference for later use
-        editor.putString(UtilString.PREF_USERNAME, username);
+        editor.putString(Util.PREF_USERNAME, username);
         editor.apply();
 
     }
 
     @Override
-    public void onPause() {
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+    }
 
-        if (logoutAlertDialog.isShowing()) logoutAlertDialog.dismiss();
+    @Override
+    public void onPageSelected(int position) {
+    }
 
-        super.onPause();
+    @Override
+    public void onPageScrollStateChanged(int state) {
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
-        if (logoutAlertDialog != null) {
-
-            if (logoutAlertDialog.isShowing()) {
-
-                outState.putBundle(ALERT_DIALOG_STATE, logoutAlertDialog.onSaveInstanceState());
-                logoutAlertDialog.dismiss();
-            }
+        if (searchViewState != null) {
+            searchViewState.onSavedInstanceState(outState);
         }
-
-        searchViewState.onSavedInstanceState(outState);
 
         super.onSaveInstanceState(outState);
     }
@@ -186,11 +195,6 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
     public void onViewStateRestored(Bundle savedInstanceState) {
 
         if (savedInstanceState != null) {
-
-            if (savedInstanceState.containsKey(ALERT_DIALOG_STATE)) {
-
-                logoutAlertDialog.onRestoreInstanceState(savedInstanceState.getBundle(ALERT_DIALOG_STATE));
-            }
 
             searchViewState.onRestoreInstanceState(savedInstanceState);
         }
@@ -217,26 +221,38 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
         searchView = (SearchView) menu.findItem(R.id.search_settings).getActionView();
         searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
         searchView.setOnQueryTextListener(this);
+        searchView.setOnSuggestionListener(this);
+        searchView.setQueryRefinementEnabled(true);
+        if (!isRecentSuggestionEnabled()) searchView.setSuggestionsAdapter(null);
 
         if (searchViewState == null) searchViewState = new SearchViewStateManager(searchView);
 
     }
 
     @Override
+    public boolean onSuggestionSelect(int position) {
+        return false;
+    }
+
+    @Override
+    public boolean onSuggestionClick(int position) {
+        return sendSearchResult(searchView.getSuggestionsAdapter().getCursor().getString(2));
+    }
+
+    @Override
     public boolean onQueryTextSubmit(String query) {
 
         if (query.trim().isEmpty()) return false;
+        if (sendSearchResult(query)) {
 
-        Intent resultIntent = new Intent(getActivity(), SearchResultActivity.class);
-        resultIntent.setAction(SearchResultFragment.SEARCH_ACTION);
-        resultIntent.putExtra(SearchResultFragment.SEARCH_QUERY, query);
+            if (isRecentSuggestionEnabled()) {
 
-        if (resultIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+                SearchRecentSuggestions searchRecentSuggestions =
+                        new SearchRecentSuggestions(getActivity(),
+                                SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
+                searchRecentSuggestions.saveRecentQuery(query, null);
+            }
 
-            searchView.setQuery("", false);
-
-            startActivity(resultIntent);
-            getActivity().overridePendingTransition(R.anim.abc_slide_in_top, R.anim.abc_slide_out_bottom);
             return true;
         }
 
@@ -284,12 +300,43 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
 
             initPushNotification();
 
+            if (isRecentSuggestionEnabled()) {
+                SearchManager searchManager = (SearchManager) getActivity().getSystemService(Context.SEARCH_SERVICE);
+                searchView.setSearchableInfo(searchManager.getSearchableInfo(getActivity().getComponentName()));
+            } else {
+                searchView.setSuggestionsAdapter(null);
+            }
+
         }
 
     }
 
+    private boolean isRecentSuggestionEnabled() {
+        return sharedPreferences.getBoolean(getString(R.string.key_recent_search_suggestion), true);
+    }
+
+    private boolean sendSearchResult(String query) {
+
+        Intent resultIntent = new Intent(getActivity(), SearchResultActivity.class);
+        resultIntent.setAction(SearchResultFragment.SEARCH_ACTION);
+        resultIntent.putExtra(SearchResultFragment.SEARCH_QUERY, query);
+
+        if (resultIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+
+            searchView.setQuery("", false);
+            searchView.setIconified(true);
+
+            startActivity(resultIntent);
+            getActivity().overridePendingTransition(R.anim.abc_slide_in_top, R.anim.abc_slide_out_bottom);
+
+            return true;
+        }
+
+        return false;
+    }
+
     private boolean isNotificationChecked() {
-        return sharedPreferences.getBoolean(UtilString.PREF_CHECK_BOX_NOTIFICATION, true);
+        return sharedPreferences.getBoolean(Util.PREF_CHECK_BOX_NOTIFICATION, true);
     }
 
     private void initPushNotification() {
@@ -308,37 +355,46 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
 
     private void initLogoutDialog() {
 
-        final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
-        alertDialogBuilder.setTitle(getString(R.string.logout_title));
-        alertDialogBuilder.setMessage(getString(R.string.logout_message));
-        alertDialogBuilder.setPositiveButton(getString(R.string.logout_title), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
+        logoutDialog =
+                AlertDialogFragment.getInstance(getString(R.string.logout_title),
+                        getString(R.string.logout_message),
+                        getString(R.string.logout_title));
+        logoutDialog.setTargetFragment(this, 0);
+        logoutDialog.show(getFragmentManager(), LOGOUT_TAG);
 
-                editor.remove(UtilString.PREF_USERNAME);
+    }
+
+    @Override
+    public void onYes(String tag) {
+
+        switch (tag) {
+
+            case LOGOUT_TAG:
+
+                editor.remove(Util.PREF_USERNAME);
                 editor.apply();
 
                 startActivity(new Intent(getActivity(), LoginActivity.class));
                 getActivity().finish();
                 getActivity().overridePendingTransition(R.anim.abc_slide_in_top, R.anim.abc_slide_out_bottom);
-            }
-        });
-        alertDialogBuilder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                dialogInterface.dismiss();
-            }
-        });
-        logoutAlertDialog = alertDialogBuilder.create();
-        logoutAlertDialog.show();
+
+                break;
+
+        }
 
     }
 
-    public SearchView getSearchView() {
-        return searchView;
+    @Override
+    public void onNo(String tag) {
+
     }
 
-    public ViewPager getViewPager() {
-        return viewPager;
+    public boolean canExit() {
+
+        if (!searchView.isIconified()) searchView.setIconified(true);
+        else if (viewPager.getCurrentItem() > 0) viewPager.setCurrentItem(0);
+        else return true;
+
+        return false;
     }
 }

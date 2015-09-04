@@ -16,6 +16,15 @@
 
     </style>
 
+    <style name="ToolbarStyle" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="toolbarStyle">@style/CustomSearchView</item>
+    </style>
+
+    <style name="CustomSearchView" parent="Widget.AppCompat.SearchView">
+        <item name="layout">@layout/search_view</item>
+        <item name="closeIcon">@drawable/ic_close</item>
+    </style>
+
     <style name="MyProgressDialog" parent="Theme.AppCompat.Dialog">
 
         <item name="android:windowIsFloating">true</item>
@@ -27,10 +36,11 @@
 
         <item name="android:layout_width">@dimen/card_view_button_width</item>
         <item name="android:layout_height">@dimen/card_view_button_height</item>
-        <item name="android:layout_marginRight">7dp</item>
-        <item name="android:layout_marginEnd">7dp</item>
+        <item name="android:layout_marginRight">@dimen/spacing_size_small</item>
+        <item name="android:layout_marginEnd">@dimen/spacing_size_small</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:textSize">@dimen/font_small</item>
 
     </style>
 
@@ -42,5 +52,45 @@
         <item name="android:overlapAnchor">false</item>
     </style>
 
+    <style name="SpinnerStyle" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:dropDownSelector">?attr/selectableItemBackground</item>
+        <item name="android:divider">@null</item>
+        <item name="android:overlapAnchor">false</item>
+
+        <item name="overlapAnchor">false</item>
+    </style>
+
+    <style name="TextViewDialogStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_margin">@dimen/spacing_size_small</item>
+        <item name="android:layout_marginLeft">@dimen/spacing_size_large</item>
+        <item name="android:layout_marginStart">@dimen/spacing_size_large</item>
+    </style>
+
+    <style name="TextViewNoStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/font_medium</item>
+    </style>
+
+    <style name="DetailTextViewStyle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">@dimen/font_small</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="ButtonDefaultSpacing">
+        <item name="android:paddingLeft">@dimen/spacing_size_medium</item>
+        <item name="android:paddingStart">@dimen/spacing_size_medium</item>
+        <item name="android:paddingRight">@dimen/spacing_size_medium</item>
+        <item name="android:paddingEnd">@dimen/spacing_size_medium</item>
+        <item name="android:paddingTop">@dimen/spacing_size_small</item>
+        <item name="android:paddingBottom">@dimen/spacing_size_small</item>
+    </style>
 
 </resources>

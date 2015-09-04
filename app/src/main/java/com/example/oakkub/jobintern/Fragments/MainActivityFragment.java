@@ -15,10 +15,11 @@ import android.view.ViewGroup;
 import com.example.oakkub.jobintern.Network.Retrofit.RestClient;
 import com.example.oakkub.jobintern.Objects.JobAdvance;
 import com.example.oakkub.jobintern.R;
+import com.example.oakkub.jobintern.UI.Dialog.AlertDialog.AlertDialogFragment;
 import com.example.oakkub.jobintern.UI.RecyclerView.EndlessRecyclerViewOnScrollListener;
-import com.example.oakkub.jobintern.UI.RecyclerView.RecyclerViewEditedJobAdvanceAdapter;
+import com.example.oakkub.jobintern.UI.RecyclerView.RecyclerViewJobAdvanceAdapter;
 import com.example.oakkub.jobintern.UI.RecyclerView.RecyclerViewJobAdvanceClickListener;
-import com.example.oakkub.jobintern.Utilities.UtilString;
+import com.example.oakkub.jobintern.Utilities.Util;
 
 import java.util.List;
 
@@ -31,16 +32,17 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public class MainActivityFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, AlertDialogFragment.YesNoListener {
 
-    public static final int LOAD_AMOUNT = 10;
+    public static final int LOAD_AMOUNT = 20;
     private static final String FRAGMENT_TYPE = "fragmentPosition";
     private static final String RECYCLE_STATE = "recyclerView";
-    private static final String ALERT_DIALOG_STATE = "jobAlertDialog";
+
     @Bind(R.id.mainRecyclerView) RecyclerView recyclerView;
     @Bind(R.id.swipeRefreshMainLayout) SwipeRefreshLayout swipeRefreshLayout;
+
     private View rootView;
-    private RecyclerViewEditedJobAdvanceAdapter recyclerViewEditedJobAdvanceAdapter;
+    private RecyclerViewJobAdvanceAdapter recyclerViewJobAdvanceAdapter;
     private RecyclerViewJobAdvanceClickListener recyclerViewJobAdvanceClickListener;
     private EndlessRecyclerViewOnScrollListener endlessRecyclerViewOnScrollListener;
 
@@ -67,7 +69,7 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
         setRetainInstance(true);
 
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-        if(username.equals("")) username = sharedPreferences.getString(UtilString.PREF_USERNAME, "");
+        if (username.equals("")) username = sharedPreferences.getString(Util.PREF_USERNAME, "");
 
     }
 
@@ -98,30 +100,16 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
 
         startFetchPosition = 0;
         endlessRecyclerViewOnScrollListener.reset();
-        recyclerViewEditedJobAdvanceAdapter.removeAllItem();
-        recyclerViewEditedJobAdvanceAdapter.setEndOfResult(false);
+        recyclerViewJobAdvanceAdapter.removeAllItem();
+        recyclerViewJobAdvanceAdapter.setEndOfResult(false);
         loadJobAdvance(true);
 
-    }
-
-    @Override
-    public void onPause() {
-
-        recyclerViewJobAdvanceClickListener.dismissDialog();
-
-        super.onPause();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
 
         outState.putParcelable(RECYCLE_STATE, recyclerView.getLayoutManager().onSaveInstanceState());
-
-        if(recyclerViewJobAdvanceClickListener.getAlertDialog() != null) {
-
-            outState.putBundle(ALERT_DIALOG_STATE, recyclerViewJobAdvanceClickListener.getAlertDialog().onSaveInstanceState());
-            recyclerViewJobAdvanceClickListener.dismissDialog();
-        }
 
         super.onSaveInstanceState(outState);
     }
@@ -133,17 +121,19 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
 
             recyclerView.getLayoutManager().onRestoreInstanceState(savedInstanceState.getParcelable(RECYCLE_STATE));
 
-            if(recyclerViewJobAdvanceClickListener.getAlertDialog() != null) {
-                recyclerViewJobAdvanceClickListener.setView(rootView);
-
-                if(savedInstanceState.containsKey(ALERT_DIALOG_STATE)) {
-                    recyclerViewJobAdvanceClickListener.getAlertDialog().onRestoreInstanceState(savedInstanceState.getBundle(ALERT_DIALOG_STATE));
-                }
-            }
-
         }
 
         super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onYes(String tag) {
+        recyclerViewJobAdvanceClickListener.onYes(tag);
+    }
+
+    @Override
+    public void onNo(String tag) {
+        recyclerViewJobAdvanceClickListener.onNo(tag);
     }
 
     private void initRecyclerView() {
@@ -151,14 +141,12 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setHasFixedSize(true);
-        if(recyclerViewEditedJobAdvanceAdapter == null) {
+        if (recyclerViewJobAdvanceAdapter == null) {
 
-            recyclerViewEditedJobAdvanceAdapter = new RecyclerViewEditedJobAdvanceAdapter(fetchCondition);
-            recyclerViewJobAdvanceClickListener = new RecyclerViewJobAdvanceClickListener(getActivity(), swipeRefreshLayout, rootView, recyclerViewEditedJobAdvanceAdapter, username);
-            recyclerViewEditedJobAdvanceAdapter.setJobAdvanceClickListener(recyclerViewJobAdvanceClickListener);
+            recyclerViewJobAdvanceAdapter = new RecyclerViewJobAdvanceAdapter(getActivity(), fetchCondition);
 
             // add progress bar
-            recyclerViewEditedJobAdvanceAdapter.addItem(null);
+            recyclerViewJobAdvanceAdapter.addItem(null);
             loadJobAdvance(true);
         }
         endlessRecyclerViewOnScrollListener = new EndlessRecyclerViewOnScrollListener(linearLayoutManager) {
@@ -168,8 +156,12 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
                 loadJobAdvance(false);
             }
         };
+
+        recyclerViewJobAdvanceClickListener = new RecyclerViewJobAdvanceClickListener(this, getActivity(), getActivity().getSupportFragmentManager(), swipeRefreshLayout, rootView, recyclerViewJobAdvanceAdapter, username);
+        recyclerViewJobAdvanceAdapter.setJobAdvanceClickListener(recyclerViewJobAdvanceClickListener);
+
         recyclerView.addOnScrollListener(endlessRecyclerViewOnScrollListener);
-        recyclerView.setAdapter(recyclerViewEditedJobAdvanceAdapter);
+        recyclerView.setAdapter(recyclerViewJobAdvanceAdapter);
 
     }
 
@@ -187,25 +179,25 @@ public class MainActivityFragment extends Fragment implements SwipeRefreshLayout
                             if (isRefresh) {
                                 // reset item
                                 swipeRefreshLayout.setRefreshing(false);
-                                recyclerViewEditedJobAdvanceAdapter.removeAllItem();
+                                recyclerViewJobAdvanceAdapter.removeAllItem();
                             } else {
                                 // remove progress bar
-                                recyclerViewEditedJobAdvanceAdapter.removeLast();
+                                recyclerViewJobAdvanceAdapter.removeLast();
                             }
 
-                            recyclerViewEditedJobAdvanceAdapter.addAllItem(jobAdvancesFromServer);
+                            recyclerViewJobAdvanceAdapter.addAllItem(jobAdvancesFromServer);
 
                             startFetchPosition += LOAD_AMOUNT;
 
-                            recyclerViewEditedJobAdvanceAdapter.addItem(null);
+                            recyclerViewJobAdvanceAdapter.addItem(null);
 
                         } else {
 
                             // remove progress bar
-                            recyclerViewEditedJobAdvanceAdapter.removeLast();
-                            recyclerViewEditedJobAdvanceAdapter.setEndOfResult(true);
+                            recyclerViewJobAdvanceAdapter.removeLast();
+                            recyclerViewJobAdvanceAdapter.setEndOfResult(true);
                             // add end result view
-                            recyclerViewEditedJobAdvanceAdapter.addItem(null);
+                            recyclerViewJobAdvanceAdapter.addItem(null);
 
                         }
 

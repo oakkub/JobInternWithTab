@@ -5,7 +5,6 @@
     <solid
         android:color="#393072"/>
 
-    <corners
-        android:radius="@dimen/card_view_bottom_radius"/>
+    <corners android:radius="@dimen/card_view_button_radius" />
 
 </shape>

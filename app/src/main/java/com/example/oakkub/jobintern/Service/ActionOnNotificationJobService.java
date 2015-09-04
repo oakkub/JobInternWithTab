@@ -8,8 +8,9 @@ import android.widget.Toast;
 
 import com.example.oakkub.jobintern.Network.InternetManager;
 import com.example.oakkub.jobintern.Network.Retrofit.RestClient;
-import com.example.oakkub.jobintern.Objects.CheckServerStatus;
-import com.example.oakkub.jobintern.Utilities.UtilString;
+import com.example.oakkub.jobintern.Objects.JobUpdateManager;
+import com.example.oakkub.jobintern.R;
+import com.example.oakkub.jobintern.Utilities.Util;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -23,8 +24,8 @@ public class ActionOnNotificationJobService extends BroadcastReceiver {
     public static final int APPROVE_REQUEST_CODE = 1122;
     public static final int DISAPPROVE_REQUEST_CODE = 1121;
 
-    public static final String APPROVE_ACTION = "com.example.oakkub.jobintern.Service.APPROVE_ACTION";
-    public static final String DISAPPROVE_ACTION = "com.example.oakkub.jobintern.Service.DISAPPROVE_ACTION";
+    public static final String APPROVE_ACTION = "com.example.oakkub.jobintern.Service.ActionOnNotificationJobService.APPROVE_ACTION";
+    public static final String DISAPPROVE_ACTION = "com.example.oakkub.jobintern.Service.ActionOnNotificationJobService.DISAPPROVE_ACTION";
 
 
     @Override
@@ -32,8 +33,8 @@ public class ActionOnNotificationJobService extends BroadcastReceiver {
 
         if(!InternetManager.isNetworkAvailable(context)) return;
 
-        String username = intent.getStringExtra(UtilString.PREF_USERNAME);
-        String jobAdvanceId = String.valueOf(intent.getIntExtra(UtilString.DB_JOB_ADVANCE_ID, 0));
+        String username = intent.getStringExtra(Util.PREF_USERNAME);
+        String jobAdvanceId = String.valueOf(intent.getIntExtra(Util.DB_JOB_ADVANCE_ID, 0));
 
         switch (intent.getAction()) {
 
@@ -55,15 +56,13 @@ public class ActionOnNotificationJobService extends BroadcastReceiver {
 
     }
 
-    private void approve(final Context context, String username, String jobAdvanceId) {
+    private void approve(final Context context, String username, final String jobAdvanceId) {
 
-        RestClient.getInstance(context).getApiService().approveJobAdvance(jobAdvanceId, username, new Callback<CheckServerStatus>() {
+        RestClient.getInstance(context).getApiService().approveJobAdvance(jobAdvanceId, username, new Callback<JobUpdateManager>() {
             @Override
-            public void success(CheckServerStatus checkServerStatus, Response response) {
+            public void success(JobUpdateManager progressCallback, Response response) {
 
-                if(checkServerStatus.isProgressOK()) {
-                    Toast.makeText(context, "Job has been approved.", Toast.LENGTH_SHORT).show();
-                }
+                checkJobSuccess(context, progressCallback);
 
             }
 
@@ -76,15 +75,13 @@ public class ActionOnNotificationJobService extends BroadcastReceiver {
 
     }
 
-    private void disapprove(final Context context, String username, String jobAdvanceId) {
+    private void disapprove(final Context context, String username, final String jobAdvanceId) {
 
-        RestClient.getInstance(context).getApiService().cancelJobAdvance(jobAdvanceId, username, new Callback<CheckServerStatus>() {
+        RestClient.getInstance(context).getApiService().cancelJobAdvance(jobAdvanceId, username, new Callback<JobUpdateManager>() {
             @Override
-            public void success(CheckServerStatus checkServerStatus, Response response) {
+            public void success(JobUpdateManager progressCallback, Response response) {
 
-                if (checkServerStatus.isProgressOK()) {
-                    Toast.makeText(context, "Job has been disapproved.", Toast.LENGTH_SHORT).show();
-                }
+                checkJobSuccess(context, progressCallback);
 
             }
 
@@ -94,6 +91,24 @@ public class ActionOnNotificationJobService extends BroadcastReceiver {
                 Toast.makeText(context, "Cannot disapprove job, please try again.", Toast.LENGTH_SHORT).show();
             }
         });
+
+    }
+
+    private void checkJobSuccess(Context context, JobUpdateManager jobUpdateManager) {
+
+        if (!jobUpdateManager.cannotUpdate()) {
+
+            String message = jobUpdateManager.getStatusPlainText(context);
+
+            if (jobUpdateManager.noUpdate()) {
+                message = context.getString(R.string.cannot_proceed) + " " + context.getString(R.string.job) + " " + context.getString(R.string.had_been) + " " + message;
+            } else if (jobUpdateManager.updateSuccessful()) {
+                message = context.getString(R.string.job) + " " + context.getString(R.string.has_been) + " " + message;
+            }
+
+            Toast.makeText(context, message, Toast.LENGTH_LONG).show();
+
+        }
 
     }
 

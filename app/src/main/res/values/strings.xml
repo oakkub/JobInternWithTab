@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">JobIntern</string>
+    <string name="app_name">Tawan Job Manager</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="refresh_settings">Refresh</string>
@@ -22,8 +22,8 @@
 
     <string name="key_notification_settings">notification</string>
     <string name="notification_title_settings">Push Notification</string>
-    <string name="notification_true">On</string>
-    <string name="notification_false">Off</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
     <string name="notification_group">notification_settings_group</string>
     <string name="enabled">Enabled</string>
 
@@ -33,6 +33,43 @@
     <string name="network_problem_title">Network problem</string>
     <string name="network_problem_message">Please check you internet connection, and come back.</string>
 
+    <string name="New">New</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="setting_history">History</string>
+    <string name="setting_key_history">history</string>
+
+    <string name="clear">Clear</string>
+    <string name="history_search_clear">Search history has been cleared.</string>
+    <string name="search">Search</string>
+    <string name="login">Login</string>
+
+    <string name="cannot_proceed">Cannot proceed,</string>
+    <string name="has_been">has been</string>
+    <string name="had_been">had been</string>
+    <string name="cannot">Cannot</string>
+    <string name="try_again">please try again</string>
+    <string name="are_you_sure">Are you sure to</string>
+    <string name="not_applicable">N/A</string>
+    <string name="no">No</string>
+
+    <string name="job">Job</string>
+    <string name="job_advance_no">Job Advance no</string>
+    <string name="job_approval">Job approval</string>
+    <string name="job_postponement">Job postponement</string>
+    <string name="job_disapproval">Job disapproval</string>
+    <string name="advance_total">Advance total</string>
+    <string name="advance">Advance</string>
+    <string name="advance_status">Advance status</string>
+    <string name="advance_approve_date">Approve date</string>
+    <string name="advance_approve_by">Approve by</string>
+    <string name="advance_cancel_by">Cancel by</string>
+
+    <string name="new_job">New Job</string>
+    <string name="job_available">New job available</string>
+    <string name="is_available">is available</string>
+    <string name="available">available</string>
+    <string name="advance_date">Advance date</string>
+    <string name="job_detail">Job detail</string>
+
 </resources>

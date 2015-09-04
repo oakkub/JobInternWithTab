@@ -20,6 +20,12 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
+        <Spinner
+            android:id="@+id/searchTypeSpinner"
+            style="@style/SpinnerStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="36dp" />
+
     </android.support.design.widget.AppBarLayout>
 
     <android.support.v7.widget.RecyclerView

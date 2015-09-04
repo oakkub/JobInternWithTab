@@ -2,14 +2,15 @@ package com.example.oakkub.jobintern.Activities;
 
 import android.app.SearchManager;
 import android.content.Intent;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.SearchView;
+import android.preference.PreferenceManager;
+import android.provider.SearchRecentSuggestions;
+import android.support.v7.app.AppCompatActivity;
 
 import com.example.oakkub.jobintern.Fragments.SearchResultFragment;
 import com.example.oakkub.jobintern.R;
-import com.example.oakkub.jobintern.Utilities.UtilString;
+import com.example.oakkub.jobintern.UI.SearchView.SuggestionProvider;
+import com.example.oakkub.jobintern.Utilities.Util;
 
 public class SearchResultActivity extends AppCompatActivity {
 
@@ -31,9 +32,15 @@ public class SearchResultActivity extends AppCompatActivity {
             SearchResultFragment searchResultFragment = getSearchResultFragment();
             if (searchResultFragment != null) {
 
+                SearchRecentSuggestions searchRecentSuggestions =
+                        new SearchRecentSuggestions(this,
+                                SuggestionProvider.AUTHORITY, SuggestionProvider.MODE);
+                searchRecentSuggestions.saveRecentQuery(query, null);
+
+
                 searchResultFragment.updateSearchResult(
                         PreferenceManager.getDefaultSharedPreferences(this)
-                                .getString(UtilString.PREF_SEARCH_TYPE,
+                                .getString(Util.PREF_SEARCH_TYPE,
                                             getString(R.string.default_value_job_type_setting)),
                                                 query);
             }
@@ -45,9 +52,7 @@ public class SearchResultActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
 
-        SearchView searchView = getSearchResultFragment().getSearchView();
-        if(!searchView.isIconified()) searchView.setIconified(true);
-        else super.onBackPressed();
+        if (getSearchResultFragment().canExit()) super.onBackPressed();
     }
 
     public SearchResultFragment getSearchResultFragment() {

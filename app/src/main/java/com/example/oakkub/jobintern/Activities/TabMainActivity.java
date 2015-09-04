@@ -18,14 +18,7 @@ public class TabMainActivity extends AppCompatActivity {
     public void onBackPressed() {
 
         TabMainActivityFragment tabMainActivityFragment = (TabMainActivityFragment) getSupportFragmentManager().findFragmentById(R.id.tab_main_fragment);
-
-        if (!tabMainActivityFragment.getSearchView().isIconified()) {
-            tabMainActivityFragment.getSearchView().setIconified(true);
-        } else if (tabMainActivityFragment.getViewPager().getCurrentItem() > 0) {
-            tabMainActivityFragment.getViewPager().setCurrentItem(0);
-        } else {
-            super.onBackPressed();
-        }
+        if (tabMainActivityFragment.canExit()) super.onBackPressed();
     }
 
 

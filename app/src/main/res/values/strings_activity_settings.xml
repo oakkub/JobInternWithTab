@@ -2,6 +2,10 @@
 
     <string name="title_activity_settings">Settings</string>
 
+    <string name="requested_job_type">Request</string>
+    <string name="postponed_job_type">Postpone</string>
+    <string name="disapproved_job_type">Disapprove</string>
+    <string name="approved_job_type">Approve</string>
     <string name="key_job_type_setting" translatable="false">jobTypeLists</string>
     <string name="title_job_type_setting">Type job</string>
     <string name="default_value_job_type_setting" translatable="false">Requested</string>
@@ -13,11 +17,24 @@
         <item>Approved</item>
     </string-array>
     <string-array name="entries_job_type_setting">
-        <item>Requested</item>
-        <item>Postponed</item>
-        <item>Disapproved</item>
-        <item>Approved</item>
+        <item>@string/requested_job_type</item>
+        <item>@string/postponed_job_type</item>
+        <item>@string/disapproved_job_type</item>
+        <item>@string/approved_job_type</item>
     </string-array>
 
+    <string name="key_clear_history_setting" translatable="false">clearHistory</string>
+    <string name="title_clear_history_setting">Clear history</string>
+    <string name="clear_search_history">Clear recent search</string>
+    <string-array name="entries_clear_history_setting">
+        <item>@string/clear_search_history</item>
+    </string-array>
+    <string-array name="values_clear_history_setting" translatable="false">
+        <item>clear_search</item>
+    </string-array>
+
+    <string name="search_setting" translatable="false">search_setting</string>
+    <string name="key_recent_search_suggestion" translatable="false">search_recent_suggestion</string>
+    <string name="title_recent_search_suggestion">Recent suggestion</string>
 
 </resources>

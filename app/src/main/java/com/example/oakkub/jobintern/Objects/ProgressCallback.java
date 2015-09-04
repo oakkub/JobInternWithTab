@@ -3,7 +3,7 @@ package com.example.oakkub.jobintern.Objects;
 /**
  * Created by OaKKuB on 7/30/2015.
  */
-public class CheckServerStatus {
+public class ProgressCallback {
 
     private boolean isProgressOK;
 

@@ -2,14 +2,13 @@ package com.example.oakkub.jobintern.UI.RecyclerView;
 
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 
 /**
  * Created by OaKKuB on 8/12/2015.
  */
 public abstract class EndlessRecyclerViewOnScrollListener extends RecyclerView.OnScrollListener {
 
-    private static final int VISIBLE_THRESHOLD = 3;
+    private static final int VISIBLE_THRESHOLD = 4;
 
     private int previousTotal = 0, currentPage = 0, totalItemCount, lastVisibleItem;
     private boolean loading = true;
@@ -27,7 +26,7 @@ public abstract class EndlessRecyclerViewOnScrollListener extends RecyclerView.O
         totalItemCount = linearLayoutManager.getItemCount();
         lastVisibleItem = linearLayoutManager.findLastCompletelyVisibleItemPosition();
 
-        // data is loaded more
+        // new data is loaded to recycler view
         if(totalItemCount > previousTotal) {
 
             loading = false;

@@ -1,5 +1,6 @@
 package com.example.oakkub.jobintern.UI.RecyclerView;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,73 +16,72 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Created by OaKKuB on 7/27/2015.
- */
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
+
 public class RecyclerViewJobAdvanceAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private final int VIEW_TYPE_PROGRESS_BAR = 0;
     private final int VIEW_TYPE_ITEM = 1;
-    private final int VIEW_TYPE_NO_ITEM = 2;
+    private final int VIEW_TYPE_END_RESULT = 2;
 
-    private List<JobAdvance> jobAdvances;
+    private final List<JobAdvance> jobAdvances;
+    private final DecimalFormat advanceTotalDecimalFormat;
     private JobAdvanceClickListener jobAdvanceClickListener;
-    private String fetchCondition;
+    private String fetchCondition, notApplicable, job, advance, no;
+    private String[] jobTypes;
+    private boolean isEndOfResult = false;
 
-    private DecimalFormat advanceTotalDecimalFormat;
-    private boolean isFooterEnabled = true, isEndOfResult = false;
-
-    public RecyclerViewJobAdvanceAdapter(String fetchCondition) {
+    public RecyclerViewJobAdvanceAdapter(Context context, String fetchCondition) {
 
         this.fetchCondition = fetchCondition;
 
+        notApplicable = context.getString(R.string.not_applicable);
+        job = context.getString(R.string.job);
+        advance = context.getString(R.string.advance);
+        no = context.getString(R.string.no);
+
+        jobTypes = context.getResources().getStringArray(R.array.value_job_type_setting);
+
         jobAdvances = new ArrayList<>();
-        advanceTotalDecimalFormat = new DecimalFormat("0.00");
+        advanceTotalDecimalFormat = new DecimalFormat("#,##0.00");
     }
 
     public void setJobAdvanceClickListener(JobAdvanceClickListener jobAdvanceClickListener) {
         this.jobAdvanceClickListener = jobAdvanceClickListener;
     }
 
-    /**
-     * Enable or disable footer (Default is true)
-     *
-     * @param isFooterEnabled boolean to turn on or off footer.
-     */
-    public void setFooterEnabled(boolean isFooterEnabled) {
-        this.isFooterEnabled = isFooterEnabled;
-    }
-
     public void setEndOfResult(boolean isEndOfResult) {
         this.isEndOfResult = isEndOfResult;
     }
 
-    public boolean isFooterEnabled() {
-        return isFooterEnabled;
-    }
-
     @Override
-     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
 
-        RecyclerView.ViewHolder viewHolder;
+        RecyclerView.ViewHolder viewHolder = null;
 
-        if(viewType == VIEW_TYPE_ITEM) {
+        switch(viewType) {
 
-            View view = LayoutInflater.from(viewGroup.getContext())
-                            .inflate(R.layout.main_card_view, viewGroup, false);
-            viewHolder = new JobDetailsViewHolder(view, this);
+            case VIEW_TYPE_ITEM:
 
-        } else if(viewType == VIEW_TYPE_PROGRESS_BAR) {
+                viewHolder = new JobDetailsViewHolder(LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.main_card_view, viewGroup, false), this);
 
-            View view = LayoutInflater.from(viewGroup.getContext())
-                            .inflate(R.layout.progress_dialog, viewGroup, false);
-            viewHolder = new ProgressBarViewHolder(view);
+                break;
 
-        } else {
+            case VIEW_TYPE_PROGRESS_BAR:
 
-            View view = LayoutInflater.from(viewGroup.getContext())
-                            .inflate(R.layout.no_data_card_view, viewGroup, false);
-            viewHolder = new EndOfResultViewHolder(view);
+                viewHolder = new ProgressBarViewHolder(LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.progress_dialog, viewGroup, false));
+
+                break;
+
+            case VIEW_TYPE_END_RESULT:
+
+                viewHolder = new EndOfResultViewHolder(LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.no_data_card_view, viewGroup, false));
+                break;
 
         }
 
@@ -91,50 +91,40 @@ public class RecyclerViewJobAdvanceAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
 
-        if(jobAdvances.size() > 0 && position < jobAdvances.size()) {
+        final JobAdvance jobAdvance = jobAdvances.get(position);
 
-            JobAdvance jobAdvance = jobAdvances.get(position);
+        if (jobAdvance != null) {
 
-            ((JobDetailsViewHolder) viewHolder).advanceNoTextView.setText("Job Advance No: " + jobAdvance.getAdvanceNo());
-            ((JobDetailsViewHolder) viewHolder).advanceTotalTextView.setText(String.valueOf(advanceTotalDecimalFormat.format(jobAdvance.getAdvanceTotal())));
+            final JobDetailsViewHolder jobViewHolder = ((JobDetailsViewHolder) viewHolder);
+
+            jobViewHolder.textViews.get(0).setText((position + 1) + ".");
+            jobViewHolder.textViews.get(1).setText(job + " " + advance + " " + no + ": " + jobAdvance.getAdvanceNo());
+            jobViewHolder.textViews.get(2).setText(job + " " + no + ": " + (jobAdvance.getJobNo().equals("") ? notApplicable : jobAdvance.getJobNo()));
+            jobViewHolder.textViews.get(3).setText(String.valueOf(advanceTotalDecimalFormat.format(jobAdvance.getAdvanceTotal())));
 
         } else {
 
             if(isEndOfResult) ((EndOfResultViewHolder) viewHolder).endOfResultTextView.setVisibility(View.VISIBLE);
             else ((ProgressBarViewHolder) viewHolder).progressBar.setIndeterminate(true);
-
         }
 
     }
 
-    public int getActualSize() {
-        return jobAdvances.size();
-    }
-
     @Override
     public int getItemCount() {
-        return isFooterEnabled ? jobAdvances.size() + 1 : jobAdvances.size();
+        return jobAdvances.size();
     }
 
     @Override
     public int getItemViewType(int position) {
 
-        if(isFooterEnabled && position >= jobAdvances.size()) {
-            if(isEndOfResult) return VIEW_TYPE_NO_ITEM;
-            else return VIEW_TYPE_PROGRESS_BAR;
-        } else {
-            return VIEW_TYPE_ITEM;
-        }
-
-        //return (isFooterEnabled && position >= jobAdvances.size()) ? VIEW_TYPE_PROGRESS_BAR : VIEW_TYPE_ITEM ;
+        // we gonna add null item, if we want the progress bar or end result text.
+        if(jobAdvances.get(position) != null) return VIEW_TYPE_ITEM;
+        else return isEndOfResult ? VIEW_TYPE_END_RESULT : VIEW_TYPE_PROGRESS_BAR;
     }
 
     public JobAdvance getItem(int position) {
         return jobAdvances.get(position);
-    }
-
-    public int getItemSize() {
-        return jobAdvances.size();
     }
 
     public void addItem(JobAdvance jobAdvance) {
@@ -147,14 +137,17 @@ public class RecyclerViewJobAdvanceAdapter extends RecyclerView.Adapter<Recycler
 
         jobAdvances.remove(position);
         notifyItemRemoved(position);
+        notifyItemRangeChanged(position, getItemCount());
+    }
+
+    public void removeLast() {
+        if(getItemCount() > 0) removeItem(getItemCount() - 1);
     }
 
     public void removeAllItem() {
 
         int size = jobAdvances.size();
-        if(size == 0) return;
-
-        jobAdvances.removeAll(jobAdvances);
+        jobAdvances.clear();
         notifyItemRangeRemoved(0, size);
 
     }
@@ -166,104 +159,93 @@ public class RecyclerViewJobAdvanceAdapter extends RecyclerView.Adapter<Recycler
         notifyItemRangeInserted(sizeBeforeAdd, jobAdvances.size());
     }
 
-    public static class EndOfResultViewHolder extends RecyclerView.ViewHolder {
+    public interface JobAdvanceClickListener {
 
-        private TextView endOfResultTextView;
+        void approveClick(int position);
+
+        void postponeClick(int position);
+
+        void disapproveClick(int position);
+
+        void onLongClick(int position);
+
+    }
+
+    static class EndOfResultViewHolder extends RecyclerView.ViewHolder {
+
+        @Bind(R.id.noDataCardViewTextView) TextView endOfResultTextView;
 
         public EndOfResultViewHolder(View itemView) {
             super(itemView);
 
-            endOfResultTextView = (TextView) itemView.findViewById(R.id.noDataCardViewTextView);
+            ButterKnife.bind(this, itemView);
         }
     }
 
-    private static class ProgressBarViewHolder extends RecyclerView.ViewHolder {
+    static class ProgressBarViewHolder extends RecyclerView.ViewHolder {
 
-        private ProgressBar progressBar;
+        @Bind(R.id.progressBar) ProgressBar progressBar;
 
         public ProgressBarViewHolder(View itemView) {
             super(itemView);
 
-            progressBar = (ProgressBar) itemView.findViewById(R.id.progressBar);
+            ButterKnife.bind(this, itemView);
         }
     }
 
-    private static class JobDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    static class JobDetailsViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener {
 
-        private TextView advanceNoTextView, advanceTotalTextView;
-        private Button approveJobAdvanceButton, cancelJobAdvanceButton, postponeJobAdvanceButton;
-
-        private RecyclerViewJobAdvanceAdapter parent;
+        private final RecyclerViewJobAdvanceAdapter parent;
+        @Bind({R.id.jobCountCardTextView, R.id.advanceNoCardTextView, R.id.jobNoCardTextView, R.id.advanceTotalCardTextView})
+        List<TextView> textViews;
+        @Bind({R.id.approveJobAdvanceCardButton, R.id.postponeJobAdvanceCardButton, R.id.disapproveJobAdvanceCardButton})
+        List<Button> buttons;
 
         public JobDetailsViewHolder(View itemView, RecyclerViewJobAdvanceAdapter parent) {
             super(itemView);
 
             this.parent = parent;
 
-            advanceNoTextView = (TextView) itemView.findViewById(R.id.advanceNoCardTextView);
-            advanceTotalTextView = (TextView) itemView.findViewById(R.id.advanceTotalCardTextView);
-            approveJobAdvanceButton = (Button) itemView.findViewById(R.id.approveJobAdvanceCardButton);
-            postponeJobAdvanceButton = (Button) itemView.findViewById(R.id.postponeJobAdvanceCardButton);
-            cancelJobAdvanceButton = (Button) itemView.findViewById(R.id.disapproveJobAdvanceCardButton);
+            ButterKnife.bind(this, itemView);
 
-            switch (parent.fetchCondition) {
+            itemView.setOnLongClickListener(this);
 
-                case "Approved":
-                case "Disapproved":
+            if (parent.fetchCondition.equalsIgnoreCase(parent.jobTypes[1])) {
 
-                    approveJobAdvanceButton.setVisibility(View.GONE);
-                    postponeJobAdvanceButton.setVisibility(View.GONE);
-                    cancelJobAdvanceButton.setVisibility(View.GONE);
+                buttons.get(1).setVisibility(View.GONE);
+            } else if (parent.fetchCondition.equalsIgnoreCase(parent.jobTypes[2]) ||
+                    parent.fetchCondition.equalsIgnoreCase(parent.jobTypes[3])) {
 
-                    break;
-
-                case "Postponed":
-
-                    postponeJobAdvanceButton.setVisibility(View.GONE);
-
-                    break;
-
+                for (int i = 0, size = buttons.size(); i < size; i++)
+                    buttons.get(i).setVisibility(View.GONE);
             }
 
-            if(approveJobAdvanceButton.getVisibility() != View.GONE) approveJobAdvanceButton.setOnClickListener(this);
-            if(postponeJobAdvanceButton.getVisibility() != View.GONE) postponeJobAdvanceButton.setOnClickListener(this);
-            if(cancelJobAdvanceButton.getVisibility() != View.GONE) cancelJobAdvanceButton.setOnClickListener(this);
+        }
 
+        @OnClick(R.id.approveJobAdvanceCardButton)
+        public void onApproveClick() {
+            parent.jobAdvanceClickListener.approveClick(getAdapterPosition());
+        }
+
+        @OnClick(R.id.postponeJobAdvanceCardButton)
+        public void onPostponeClick() {
+            parent.jobAdvanceClickListener.postponeClick(getAdapterPosition());
+        }
+
+        @OnClick(R.id.disapproveJobAdvanceCardButton)
+        public void onDisapproveClick() {
+            parent.jobAdvanceClickListener.disapproveClick(getAdapterPosition());
         }
 
         @Override
-        public void onClick(final View view) {
-
-            switch(view.getId()) {
-
-                case R.id.postponeJobAdvanceCardButton:
-
-                    parent.jobAdvanceClickListener.postponeClick(getAdapterPosition());
-                    return;
-
-                case R.id.disapproveJobAdvanceCardButton:
-
-                    parent.jobAdvanceClickListener.disapproveClick(getAdapterPosition());
-                    return;
-
-                case R.id.approveJobAdvanceCardButton:
-
-                    parent.jobAdvanceClickListener.approveClick(getAdapterPosition());
-                    return;
-
+        public boolean onLongClick(View view) {
+            if (view.getId() == itemView.getId()) {
+                parent.jobAdvanceClickListener.onLongClick(getAdapterPosition());
+                return true;
+            } else {
+                return false;
             }
-
         }
-
-
-    }
-
-    public interface JobAdvanceClickListener {
-
-        void approveClick(int position);
-        void postponeClick(int position);
-        void disapproveClick(int position);
-
     }
 
 }

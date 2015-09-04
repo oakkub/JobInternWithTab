@@ -1,80 +1,92 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:id="@+id/cardView"
-    android:layout_margin="2.5dp"
-    card_view:cardCornerRadius="2.5dp">
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="@dimen/small_radius"
+    app:cardUseCompatPadding="true"
+    app:contentPadding="@dimen/spacing_size_tiny">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginBottom="7dp">
+        android:layout_height="wrap_content">
 
         <TextView
-            android:id="@+id/advanceNoCardTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:id="@+id/jobCountCardTextView"
+            style="@style/TextViewNoStyle"
+            android:layout_width="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="4dp"
-            android:layout_marginStart="4dp"
-            android:textStyle="bold" />
+            android:layout_marginEnd="@dimen/tiny_margin"
+            android:layout_marginLeft="@dimen/spacing_size_small"
+            android:layout_marginRight="@dimen/tiny_margin"
+            android:layout_marginStart="@dimen/spacing_size_small" />
+
+        <TextView
+            android:id="@+id/advanceNoCardTextView"
+            style="@style/TextViewNoStyle"
+            android:layout_toEndOf="@+id/jobCountCardTextView"
+            android:layout_toRightOf="@+id/jobCountCardTextView" />
+
+        <TextView
+            android:id="@+id/jobNoCardTextView"
+            style="@style/TextViewNoStyle"
+            android:layout_alignLeft="@+id/advanceNoCardTextView"
+            android:layout_alignStart="@+id/advanceNoCardTextView"
+            android:layout_below="@+id/advanceNoCardTextView" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/costTextView"
+            android:layout_below="@+id/jobNoCardTextView"
             android:layout_toLeftOf="@+id/advanceTotalCardTextView"
             android:layout_toStartOf="@+id/advanceTotalCardTextView"
-            android:layout_below="@+id/advanceNoCardTextView"
+            android:freezesText="true"
             android:text="@string/costTextView"
             android:textColor="@color/colorPrimaryDark"
-            style="?android:attr/textAppearanceSmall" />
+            android:textSize="@dimen/font_small" />
 
         <TextView
             android:id="@+id/advanceTotalCardTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            style="@style/DetailTextViewStyle"
             android:layout_alignParentEnd="true"
-            android:layout_marginRight="4dp"
-            android:layout_marginEnd="4dp"
-            android:layout_below="@+id/advanceNoCardTextView"
-            android:singleLine="true"
-            android:textColor="@color/colorPrimaryDark"
-            style="?android:attr/textAppearanceSmall" />
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/jobNoCardTextView"
+            android:layout_marginEnd="@dimen/spacing_size_small"
+            android:layout_marginRight="@dimen/spacing_size_small" />
 
         <Button
             android:id="@+id/disapproveJobAdvanceCardButton"
-            android:text="@string/disapprove_button"
-            android:layout_toStartOf="@+id/postponeJobAdvanceCardButton"
-            android:layout_toLeftOf="@+id/postponeJobAdvanceCardButton"
+            style="@style/CardViewButton"
             android:layout_below="@+id/advanceTotalCardTextView"
+            android:layout_toLeftOf="@+id/postponeJobAdvanceCardButton"
+            android:layout_toStartOf="@+id/postponeJobAdvanceCardButton"
             android:background="@drawable/selector_card_view_cancel_button_shape"
-            style="@style/CardViewButton" />
+            android:text="@string/disapprove_button" />
 
         <Button
             android:id="@+id/postponeJobAdvanceCardButton"
-            android:text="@string/postpone_button"
-            android:layout_toStartOf="@+id/approveJobAdvanceCardButton"
-            android:layout_toLeftOf="@+id/approveJobAdvanceCardButton"
+            style="@style/CardViewButton"
             android:layout_below="@+id/advanceTotalCardTextView"
+            android:layout_toLeftOf="@+id/approveJobAdvanceCardButton"
+            android:layout_toStartOf="@+id/approveJobAdvanceCardButton"
             android:background="@drawable/selector_card_view_postpone_button_shape"
-            style="@style/CardViewButton" />
+            android:text="@string/postpone_button" />
 
         <Button
             android:id="@+id/approveJobAdvanceCardButton"
-            android:text="@string/approve_button"
-            android:layout_alignParentRight="true"
+            style="@style/CardViewButton"
             android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
             android:layout_below="@+id/advanceTotalCardTextView"
             android:background="@drawable/selector_card_view_approve_button_shape"
-            style="@style/CardViewButton" />
+            android:text="@string/approve_button" />
 
     </RelativeLayout>
 

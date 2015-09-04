@@ -12,12 +12,12 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.util.Log;
 
-import com.example.oakkub.jobintern.Activities.MainActivity;
+import com.example.oakkub.jobintern.Activities.LoginActivity;
 import com.example.oakkub.jobintern.Network.InternetManager;
 import com.example.oakkub.jobintern.Network.Retrofit.RestClient;
 import com.example.oakkub.jobintern.Objects.CheckNewJobAdvance;
 import com.example.oakkub.jobintern.R;
-import com.example.oakkub.jobintern.Utilities.UtilString;
+import com.example.oakkub.jobintern.Utilities.Util;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -32,22 +32,23 @@ public class CheckJobReceiver extends BroadcastReceiver {
     public static final int ALERT_NEW_JOB_REQUEST_CODE = 2;
     public static final String ALERT_NEW_JOB_ACTION = "com.example.oakkub.jobintern.Service.CHECK_JOB_RECEIVER";
 
+    private SharedPreferences sharedPreferences;
     private NotificationCompat.Builder  newJobNotification = null;
 
     @Override
     public void onReceive(Context context, Intent intent) {
 
-        Log.i("RECEIVER", getClass().getSimpleName());
+        Log.i("BroadcastReceiver", getClass().getSimpleName().toString());
 
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 
         // check internet connection and username if user is logged in or not
         if(!InternetManager.isNetworkAvailable(context) ||
-            !sharedPreferences.getBoolean(UtilString.PREF_CHECK_BOX_NOTIFICATION, true) ||
-            !sharedPreferences.contains(UtilString.PREF_USERNAME) ||
-             sharedPreferences.getString(UtilString.PREF_USERNAME, "").equals("")) return;
+                !sharedPreferences.getBoolean(Util.PREF_CHECK_BOX_NOTIFICATION, true) ||
+                !sharedPreferences.contains(Util.PREF_USERNAME) ||
+                sharedPreferences.getString(Util.PREF_USERNAME, "").equals("")) return;
 
-        Intent jobListIntent = new Intent(context, MainActivity.class);
+        Intent jobListIntent = new Intent(context, LoginActivity.class);
         jobListIntent.setAction(ALERT_NEW_JOB_ACTION);
 
         TaskStackBuilder taskStackBuilder = TaskStackBuilder.create(context);
@@ -59,8 +60,8 @@ public class CheckJobReceiver extends BroadcastReceiver {
                         PendingIntent.FLAG_UPDATE_CURRENT);
 
         createNotification(context,
-                    alertPendingIntent, "New jobs available",
-                            "New jobs", "New jobs available");
+                alertPendingIntent, context.getString(R.string.job_available),
+                context.getString(R.string.new_job), context.getString(R.string.job_available));
 
         checkNewJob(context);
 
@@ -101,32 +102,39 @@ public class CheckJobReceiver extends BroadcastReceiver {
             @Override
             public void success(CheckNewJobAdvance checkNewJobAdvance, Response response) {
 
+                setConnectivityChange();
+
                 // 0 = New job: available (single job)
                 // 1 = New jobs: available (multiple jobs)
                 // 2 = No job
+
+                String newJobAvailable = context.getString(R.string.job_available);
 
                 switch (checkNewJobAdvance.getJobInfo()) {
 
                     case "0":
 
-                        newJobNotification.setContentTitle("New Job available");
-                        newJobNotification.setContentText("Job " + checkNewJobAdvance.getJobAdvno() + " is available.");
-                        newJobNotification.setTicker("New Job " + checkNewJobAdvance.getJobAdvno() + " is available.");
+                        newJobNotification.setContentTitle(newJobAvailable);
+                        newJobNotification.setContentText(context.getString(R.string.job) + " " + checkNewJobAdvance.getJobAdvno());
+                        newJobNotification.setTicker(context.getString(R.string.job) + " " + checkNewJobAdvance.getJobAdvno());
+
+                        String approve = context.getString(R.string.approved_job_type);
+                        String disapprove = context.getString(R.string.disapproved_job_type);
 
                         // create pending intent for each action
                         Intent actionIntent = new Intent(context, ActionOnNotificationJobService.class);
-                        actionIntent.putExtra(UtilString.DB_JOB_ADVANCE_ID, checkNewJobAdvance.getJobAdvId());
-                        actionIntent.putExtra(UtilString.PREF_USERNAME,
+                        actionIntent.putExtra(Util.DB_JOB_ADVANCE_ID, checkNewJobAdvance.getJobAdvId());
+                        actionIntent.putExtra(Util.PREF_USERNAME,
                                 PreferenceManager.getDefaultSharedPreferences(context)
-                                        .getString(UtilString.PREF_USERNAME, ""));
+                                        .getString(Util.PREF_USERNAME, ""));
 
                         actionIntent.setAction(ActionOnNotificationJobService.APPROVE_ACTION);
-                        newJobNotification.addAction(R.drawable.ic_ok, "Approve", PendingIntent.getBroadcast(context,
+                        newJobNotification.addAction(R.drawable.ic_ok, approve.substring(0, approve.length() - 1), PendingIntent.getBroadcast(context,
                                 ActionOnNotificationJobService.APPROVE_REQUEST_CODE, actionIntent,
                                 PendingIntent.FLAG_ONE_SHOT));
 
                         actionIntent.setAction(ActionOnNotificationJobService.DISAPPROVE_ACTION);
-                        newJobNotification.addAction(R.drawable.ic_close, "Disapprove", PendingIntent.getBroadcast(context,
+                        newJobNotification.addAction(R.drawable.ic_close, disapprove.substring(0, disapprove.length() - 1), PendingIntent.getBroadcast(context,
                                 ActionOnNotificationJobService.DISAPPROVE_REQUEST_CODE, actionIntent,
                                 PendingIntent.FLAG_ONE_SHOT));
 
@@ -136,7 +144,7 @@ public class CheckJobReceiver extends BroadcastReceiver {
 
                     case "1":
 
-                        newJobNotification.setContentText(checkNewJobAdvance.getJobItem() + " Jobs available.");
+                        newJobNotification.setContentText(checkNewJobAdvance.getJobItem() + context.getString(R.string.job) + " " + context.getString(R.string.available));
                         notificationManager.notify(ALERT_NEW_JOB_NOTIFICATION, newJobNotification.build());
 
                         break;
@@ -154,10 +162,22 @@ public class CheckJobReceiver extends BroadcastReceiver {
             @Override
             public void failure(RetrofitError error) {
 
+                setConnectivityChange();
+
                 Log.e("NOTIFICATION ERROR", error.getMessage());
 
             }
         });
 
+    }
+
+    private void setConnectivityChange() {
+
+        if (sharedPreferences.contains(Util.CONNECTIVITY_CHANGE)) {
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putBoolean(Util.CONNECTIVITY_CHANGE, true);
+            editor.apply();
+        }
     }
 }

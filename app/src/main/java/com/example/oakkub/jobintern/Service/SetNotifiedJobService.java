@@ -2,8 +2,8 @@ package com.example.oakkub.jobintern.Service;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.util.Log;
 
-import com.crashlytics.android.Crashlytics;
 import com.example.oakkub.jobintern.Network.InternetManager;
 import com.example.oakkub.jobintern.Network.Retrofit.RestClient;
 
@@ -14,7 +14,7 @@ import retrofit.RetrofitError;
  */
 public class SetNotifiedJobService extends IntentService {
 
-    public static String ACTION_SET_NOTIFIED = "com.example.oakkub.jobintern.Service.ACTION_SET_NOTIFIED";
+    public static String ACTION_SET_NOTIFIED = "com.example.oakkub.jobintern.Service.SetNotifiedJobService.ACTION_SET_NOTIFIED";
     public static int REQUEST_CODE_SET_NOTIFIED = 777;
 
     public SetNotifiedJobService() {
@@ -26,17 +26,23 @@ public class SetNotifiedJobService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(final Intent intent) {
         // IntentService is run in background.
 
-        if(intent.getAction() == ACTION_SET_NOTIFIED) {
+        setJobNotified(intent);
+
+    }
+
+    private void setJobNotified(Intent intent) {
+
+        if (intent.getAction().equals(ACTION_SET_NOTIFIED)) {
 
             if(!InternetManager.isInternetConnected(this)) return;
 
             try {
                 RestClient.getInstance(this).getApiService().setNotifiedJobAdvance();
             } catch (RetrofitError error) {
-                Crashlytics.logException(error);
+                Log.i("Network error", error.toString());
             }
 
         }

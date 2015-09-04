@@ -1,7 +1,7 @@
 package com.example.oakkub.jobintern.UI.SearchView;
 
 import android.os.Bundle;
-import android.widget.SearchView;
+import android.support.v7.widget.SearchView;
 
 /**
  * Created by OaKKuB on 8/22/2015.
@@ -36,6 +36,11 @@ public class SearchViewStateManager {
         }
     }
 
+    /**
+     * Use this in method onPrepareOptionsMenu
+     *
+     * @param searchView SearchView to return state
+     */
     public void setPreviousState(SearchView searchView) {
         if(hasFocus) {
             searchView.setQuery(searchQuery, false);

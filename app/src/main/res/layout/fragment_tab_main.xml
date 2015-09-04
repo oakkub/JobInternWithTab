@@ -4,12 +4,13 @@
     android:id="@+id/tabMainRootView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Activities.TabMainActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/mainAppBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
         <android.support.v7.widget.Toolbar
             android:id="@+id/mainToolbar"
@@ -17,7 +18,6 @@
             android:layout_height="wrap_content"
             android:background="?attr/colorPrimary"
             android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
@@ -25,8 +25,7 @@
             android:id="@+id/mainTabLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabMode="scrollable"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+            app:tabMode="scrollable" />
 
     </android.support.design.widget.AppBarLayout>
 

@@ -1,11 +1,10 @@
-package com.example.oakkub.jobintern.UI.ProgressDialog;
+package com.example.oakkub.jobintern.UI.Dialog.ProgressDialog;
 
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -23,7 +22,12 @@ public class MyProgressDialog extends ProgressDialog {
         getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
+        setCancelable(false);
         setCanceledOnTouchOutside(false);
+    }
+
+    public static MyProgressDialog getInstance(Context context) {
+        return new MyProgressDialog(context);
     }
 
     @Override

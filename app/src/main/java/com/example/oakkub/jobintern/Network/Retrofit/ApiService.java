@@ -1,8 +1,9 @@
 package com.example.oakkub.jobintern.Network.Retrofit;
 
 import com.example.oakkub.jobintern.Objects.CheckNewJobAdvance;
-import com.example.oakkub.jobintern.Objects.CheckServerStatus;
 import com.example.oakkub.jobintern.Objects.JobAdvance;
+import com.example.oakkub.jobintern.Objects.JobUpdateManager;
+import com.example.oakkub.jobintern.Objects.ProgressCallback;
 
 import java.util.List;
 
@@ -42,22 +43,22 @@ public interface ApiService {
     @POST("/login.php")
     void hasUser(@Field("username") String username,
                  @Field("password") String password,
-                 Callback<CheckServerStatus> checkUserCallback);
+                 Callback<ProgressCallback> checkUserCallback);
 
     @FormUrlEncoded
     @POST("/approve_job_advance.php")
     void approveJobAdvance(@Field("jobAdvanceId") String jobAdvanceId,
                            @Field("approveBy") String userApprove,
-                           Callback<CheckServerStatus> checkApproveCallback);
+                           Callback<JobUpdateManager> checkApproveCallback);
 
     @FormUrlEncoded
     @POST("/postpone_job_advance.php")
     void postponeJobAdvance(@Field("jobAdvanceId") String jobAdvanceId,
-                            Callback<CheckServerStatus> checkPostponeCallback);
+                            Callback<JobUpdateManager> checkPostponeCallback);
 
     @FormUrlEncoded
     @POST(("/cancel_job_advance.php"))
     void cancelJobAdvance(@Field("jobAdvanceId") String jobAdvanceId,
                           @Field("cancelBy") String cancelBy,
-                          Callback<CheckServerStatus> checkCancelCallback);
+                          Callback<JobUpdateManager> checkCancelCallback);
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.util.SparseArray;
 
 import com.example.oakkub.jobintern.Fragments.MainActivityFragment;
 import com.example.oakkub.jobintern.R;
@@ -14,12 +15,17 @@ import com.example.oakkub.jobintern.R;
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     private static final int MAX_TAP = 4;
-    private String[] type;
+    private String[] entries, values;
+    private SparseArray<Fragment> fragments;
 
     public ViewPagerAdapter(FragmentManager fragmentManager, Context context) {
         super(fragmentManager);
 
-        type = context.getResources().getStringArray(R.array.value_job_type_setting);
+        entries = context.getResources().getStringArray(R.array.entries_job_type_setting);
+        values = context.getResources().getStringArray(R.array.value_job_type_setting);
+
+        fragments = new SparseArray<>(MAX_TAP);
+
     }
 
     @Override
@@ -29,25 +35,37 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        /*switch (position) {
 
-            case 0:
-                return RequestedFragment.getInstance(type[position]);
-            case 1:
-                return PostponedFragment.getInstance(type[position]);
-            case 2:
-                return DisapprovedFragment.getInstance(type[position]);
-            case 3:
-                return ApprovedFragment.getInstance(type[position]);
-            default:
-                return RequestedFragment.getInstance(type[position]);
+        Fragment fragment = fragments.get(position);
 
-        }*/
-        return MainActivityFragment.getInstance(type[position]);
+        if (fragment == null) {
+
+            switch (position) {
+
+                case 0:
+                    fragment = MainActivityFragment.getInstance(values[0]);
+                    break;
+                case 1:
+                    fragment = MainActivityFragment.getInstance(values[1]);
+                    break;
+                case 2:
+                    fragment = MainActivityFragment.getInstance(values[2]);
+                    break;
+                case 3:
+                    fragment = MainActivityFragment.getInstance(values[3]);
+                    break;
+                default:
+                    fragment = null;
+
+            }
+
+        }
+
+        return fragment;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return type[position];
+        return entries[position];
     }
 }
