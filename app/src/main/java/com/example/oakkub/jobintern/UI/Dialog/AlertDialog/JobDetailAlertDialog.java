@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.example.oakkub.jobintern.Objects.JobAdvance;
 import com.example.oakkub.jobintern.R;
-import com.example.oakkub.jobintern.Utilities.Converter;
+import com.example.oakkub.jobintern.Utilities.UtilMethod;
 
 import java.text.DecimalFormat;
 import java.util.HashMap;
@@ -63,11 +63,11 @@ public class JobDetailAlertDialog extends DialogFragment {
         Bundle args = new Bundle();
         args.putString(ADVANCE_NO, jobAdvance.getAdvanceNo());
         args.putString(JOB_NO, jobAdvance.getJobNo());
-        args.putString(ADVANCE_DATE, Converter.getPreferredDateFormat(jobAdvance.getAdvanceDate()));
+        args.putString(ADVANCE_DATE, UtilMethod.getPreferredDateFormat(jobAdvance.getAdvanceDate()));
         args.putDouble(ADVANCE_TOTAL, jobAdvance.getAdvanceTotal());
-        args.putString(ADVANCE_STATUS, Converter.capitalize(jobAdvance.getAdvanceStatusReadableFormat(context)));
+        args.putString(ADVANCE_STATUS, UtilMethod.capitalize(jobAdvance.getAdvanceStatusReadableFormat(context)));
         args.putSerializable(STATUS_CONDITION, jobAdvance.getStatusAvailable());
-        args.putString(ADVANCE_APPROVE_DATE, Converter.getPreferredDateFormat(jobAdvance.getAdvanceApproveDate()));
+        args.putString(ADVANCE_APPROVE_DATE, UtilMethod.getPreferredDateFormat(jobAdvance.getAdvanceApproveDate()));
         args.putString(ADVANCE_APPROVE_BY, jobAdvance.getAdvanceApproveBy());
         args.putString(ADVANCE_CANCEL_BY, jobAdvance.getAdvanceCancelBy());
 

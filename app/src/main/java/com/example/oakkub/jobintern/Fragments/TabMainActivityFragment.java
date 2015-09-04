@@ -102,7 +102,7 @@ public class TabMainActivityFragment extends Fragment implements SearchView.OnQu
         initToolbar((AppCompatActivity) getActivity());
 
         viewPager.setOffscreenPageLimit(2);
-        viewPager.setAdapter(new ViewPagerAdapter(getFragmentManager(), getActivity().getApplicationContext()));
+        viewPager.setAdapter(new ViewPagerAdapter(getFragmentManager(), getActivity()));
         viewPager.addOnPageChangeListener(this);
         tabLayout.setupWithViewPager(viewPager);
 

@@ -84,7 +84,8 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="@color/black"
                 android:textColorHint="?attr/colorAccent"
-                android:textSize="@dimen/font_medium" />
+                android:textSize="@dimen/font_medium"
+                android:imeOptions="actionDone" />
 
         </android.support.design.widget.TextInputLayout>
 

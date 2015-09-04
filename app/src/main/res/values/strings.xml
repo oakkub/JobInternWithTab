@@ -5,6 +5,10 @@
     <string name="refresh_settings">Refresh</string>
     <string name="logoutSettings">Log Out</string>
     <string name="costTextView">Cost: </string>
+    <string name="input_wrong_condition">Username of password is incorrect.</string>
+    <string name="input_error_condition">Cannot login, please try again.</string>
+    <string name="input_not_meet_condition">Username and password must have</string>
+    <string name="characters">Characters</string>
 
     <string name="jobApproveLists">Job Approve Lists</string>
     <string name="title_activity_login">LoginActivity</string>

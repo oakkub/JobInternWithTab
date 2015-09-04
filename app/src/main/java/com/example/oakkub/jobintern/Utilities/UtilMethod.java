@@ -1,6 +1,10 @@
 package com.example.oakkub.jobintern.Utilities;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.res.Resources;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -11,7 +15,7 @@ import java.util.Locale;
 /**
  * Created by OaKKuB on 8/25/2015.
  */
-public class Converter {
+public class UtilMethod {
 
     public static int pxToDp(int px) {
         return (int) (px / Resources.getSystem().getDisplayMetrics().density);
@@ -25,13 +29,26 @@ public class Converter {
         return stringToBeCapitalized.substring(0, 1).toUpperCase() + stringToBeCapitalized.substring(1).toLowerCase();
     }
 
+    public static String getPreferredDateFormat(Date dateToBeFormatted) {
+
+        SimpleDateFormat preferredDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getAvailableLocales()[Util.TH_LOCALE]);
+        Date date = dateToBeFormatted;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.add(Calendar.YEAR, 543);
+
+        date = calendar.getTime();
+
+        return preferredDateFormat.format(date);
+    }
+
     public static String getPreferredDateFormat(String dateToBeFormatted) {
 
         if (dateToBeFormatted.equalsIgnoreCase("")) return "";
 
         Date date = null;
         SimpleDateFormat defaultDateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getAvailableLocales()[Util.TH_LOCALE]);
-        SimpleDateFormat preferredDateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getAvailableLocales()[Util.TH_LOCALE]);
 
         /*Log.i("Default Locale", String.valueOf(Locale.getDefault()));
         for(String ISOLanguage: Locale.getISOLanguages())
@@ -48,13 +65,17 @@ public class Converter {
             e.printStackTrace();
         }
 
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(date);
-        calendar.add(Calendar.YEAR, 543);
+        return getPreferredDateFormat(date);
+    }
 
-        date = calendar.getTime();
+    public static void hideSoftKeyboard(Context context) {
 
-        return preferredDateFormat.format(date);
+        InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        View view = ((Activity) context).getCurrentFocus();
+        if (view == null) return;
+
+        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
     }
 
 }

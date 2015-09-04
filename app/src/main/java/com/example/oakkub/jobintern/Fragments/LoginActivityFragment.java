@@ -10,12 +10,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.example.oakkub.jobintern.Activities.TabMainActivity;
 import com.example.oakkub.jobintern.Network.Retrofit.RestClient;
@@ -24,6 +26,7 @@ import com.example.oakkub.jobintern.Objects.User;
 import com.example.oakkub.jobintern.R;
 import com.example.oakkub.jobintern.UI.Dialog.ProgressDialog.ProgressDialogFragment;
 import com.example.oakkub.jobintern.Utilities.Util;
+import com.example.oakkub.jobintern.Utilities.UtilMethod;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -35,7 +38,7 @@ import retrofit.client.Response;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class LoginActivityFragment extends Fragment implements TextWatcher {
+public class LoginActivityFragment extends Fragment implements TextWatcher, TextView.OnEditorActionListener {
 
     private final int INPUT_MINIMUM = 3;
 
@@ -58,6 +61,14 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
         super.onCreate(savedInstanceState);
 
         setRetainInstance(true);
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+        // check if user is login
+        if (sharedPreferences.contains(Util.PREF_USERNAME)) {
+            goToMainScreen();
+        }
+
     }
 
     @Override
@@ -70,15 +81,9 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
 
         setToolbar((AppCompatActivity) getActivity());
 
-        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
-
-        // check if user is login
-        if (sharedPreferences.contains(Util.PREF_USERNAME)) {
-            goToMainScreen();
-        }
-
         usernameEditText.addTextChangedListener(this);
         passwordEditText.addTextChangedListener(this);
+        passwordEditText.setOnEditorActionListener(this);
 
         progressDialog = new ProgressDialogFragment();
 
@@ -116,16 +121,30 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
 
     }
 
+    @Override
+    public boolean onEditorAction(TextView textView, int actionId, KeyEvent event) {
+
+        switch (actionId) {
+
+            case EditorInfo.IME_ACTION_DONE:
+
+                UtilMethod.hideSoftKeyboard(getActivity());
+
+                login();
+
+                return true;
+
+            default:
+                return false;
+
+        }
+
+    }
+
     @OnClick(R.id.loginButton)
     void login() {
 
         progressDialog.show(getFragmentManager(), "progressDialog");
-        /*new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startLogin();
-            }
-        }, 20000);*/
         startLogin();
     }
 
@@ -138,7 +157,7 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
 
             progressDialog.dismiss();
 
-            Snackbar.make(rootView, "Username and password must have at least " + INPUT_MINIMUM + " characters.", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(rootView, getString(R.string.input_not_meet_condition) + " " + INPUT_MINIMUM + " " + getString(R.string.characters).toLowerCase(), Snackbar.LENGTH_LONG).show();
             return;
         }
 
@@ -149,8 +168,6 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
             public void success(ProgressCallback progressCallback, Response response) {
 
                 progressDialog.dismiss();
-
-                Log.i("CALLBACK", String.valueOf(progressCallback.isProgressOK()));
 
                 if (progressCallback.isProgressOK()) {
 
@@ -166,7 +183,7 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
 
                 } else {
 
-                    Snackbar.make(rootView, "Username or password are incorrect.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(rootView, getString(R.string.input_wrong_condition), Snackbar.LENGTH_SHORT).show();
 
                 }
 
@@ -174,11 +191,10 @@ public class LoginActivityFragment extends Fragment implements TextWatcher {
 
             @Override
             public void failure(RetrofitError error) {
-                Log.e("LOGIN ERROR", error.getMessage());
 
                 progressDialog.dismiss();
 
-                Snackbar.make(rootView, "Cannot login, Please try again.", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(rootView, getString(R.string.input_error_condition), Snackbar.LENGTH_SHORT).show();
             }
         });
 
